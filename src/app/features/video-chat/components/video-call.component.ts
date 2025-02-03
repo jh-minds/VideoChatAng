@@ -32,7 +32,7 @@ export class VideoCallComponent {
 
   async initLocalStream() {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       this.localVideoRef.nativeElement.srcObject = this.localStream;
     } catch (err) {
       console.error('Error accessing media devices.', err);
