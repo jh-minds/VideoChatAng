@@ -1,6 +1,11 @@
 <div>
   <h1>Video Call</h1>
-  <video #localVideo autoplay muted></video>
-  <video #remoteVideo autoplay></video>
+
+  <div style="display: flex; gap: 10px;">
+    <video #localVideo autoplay muted playsinline style="width: 300px; height: 200px; border: 2px solid black;"></video>
+    <video #remoteVideo autoplay playsinline style="width: 300px; height: 200px; border: 2px solid black;"></video>
+  </div>
+
   <button (click)="startCall()">Start Call</button>
+  <button (click)="endCall()">End Call</button>
 </div>
