@@ -1,93 +1,80 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { SignalingService } from '../../../core/services/signaling.service';
+import { Injectable } from '@angular/core';
+import { io, Socket } from 'socket.io-client';
 
-@Component({
-  selector: 'app-video-call',
-  templateUrl: './video-call.component.html',
-  styleUrls: ['./video-call.component.css'],
-  standalone: true
+@Injectable({
+  providedIn: 'root'
 })
-export class VideoCallComponent {
-
-  @ViewChild('localVideo') localVideoRef!: ElementRef;
-  @ViewChild('remoteVideo') remoteVideoRef!: ElementRef;
-  private localStream!: MediaStream;
+export class SignalingService {
+  private socket: Socket;
+  private serverUrl: string = 'wss://signaling-server-i9zw.onrender.com';
   private peerConnection!: RTCPeerConnection;
-  private iceServers = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'turn:your.turn.server' } // Optional: You can set up a TURN server here
-    ]
-  };
 
-  constructor(private signalingService: SignalingService) {
-    this.signalingService.onOffer((offer: any) => this.handleOffer(offer));
-    this.signalingService.onAnswer((answer: any) => this.handleAnswer(answer));
-    this.signalingService.onIceCandidate((candidate: RTCIceCandidate) => this.handleIceCandidate(candidate));
+  constructor() {
+    this.socket = io(this.serverUrl, {
+      transports: ['websocket'],
+      withCredentials: true
+    });
+
+    this.socket.on('connect', () => {
+      console.log('Connected to signaling server:', this.socket.id);
+    });
+
+    this.socket.on('connect_error', (err) => {
+      console.error('Socket connection error:', err);
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.warn('Disconnected from signaling server:', reason);
+    });
+
+    // Initialize the peer connection
+    this.initializePeerConnection();
   }
 
-  async ngOnInit() {
-    await this.initLocalStream();
-  }
+  private initializePeerConnection() {
+    const iceServers = [
+      { urls: "stun:stun.l.google.com:19302" },
+      {
+        urls: "turn:your-turn-server.com",
+        username: "your-username",
+        credential: "your-password"
+      }
+    ];
 
-  async initLocalStream() {
-    try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      this.localVideoRef.nativeElement.srcObject = this.localStream;
-    } catch (err) {
-      console.error('Error accessing media devices.', err);
-    }
-  }
-
-  startCall() {
-    this.peerConnection = new RTCPeerConnection(this.iceServers);
-    this.localStream.getTracks().forEach(track => this.peerConnection.addTrack(track, this.localStream));
+    this.peerConnection = new RTCPeerConnection({ iceServers });
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.signalingService.sendIceCandidate(event.candidate);
+        this.sendIceCandidate(event.candidate);
       }
     };
 
-    this.peerConnection.ontrack = (event) => {
-      this.remoteVideoRef.nativeElement.srcObject = event.streams[0];
+    this.peerConnection.onconnectionstatechange = () => {
+      console.log('Connection State:', this.peerConnection.connectionState);
     };
-
-    this.peerConnection.createOffer().then(offer => {
-      return this.peerConnection.setLocalDescription(offer);
-    }).then(() => {
-      this.signalingService.sendOffer(this.peerConnection.localDescription);
-    }).catch(error => console.error(error));
   }
 
-  handleOffer(offer: RTCSessionDescriptionInit) {
-    this.peerConnection = new RTCPeerConnection(this.iceServers);
-    this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-    this.localStream.getTracks().forEach(track => this.peerConnection.addTrack(track, this.localStream));
-
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.signalingService.sendIceCandidate(event.candidate);
-      }
-    };
-
-    this.peerConnection.ontrack = (event) => {
-      this.remoteVideoRef.nativeElement.srcObject = event.streams[0];
-    };
-
-    this.peerConnection.createAnswer().then(answer => {
-      return this.peerConnection.setLocalDescription(answer);
-    }).then(() => {
-      this.signalingService.sendAnswer(this.peerConnection.localDescription);
-    }).catch(error => console.error(error));
+  sendOffer(offer: RTCSessionDescriptionInit) {
+    this.socket.emit('offer', offer);
   }
 
-  handleAnswer(answer: RTCSessionDescriptionInit) {
-    this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer)).catch(error => console.error(error));
+  sendAnswer(answer: RTCSessionDescriptionInit) {
+    this.socket.emit('answer', answer);
   }
 
-  handleIceCandidate(candidate: RTCIceCandidate) {
-    this.peerConnection.addIceCandidate(candidate).catch(error => console.error(error));
+  sendIceCandidate(candidate: RTCIceCandidate) {
+    this.socket.emit('ice-candidate', candidate);
+  }
+
+  onOffer(callback: (offer: any) => void) {
+    this.socket.on('offer', callback);
+  }
+
+  onAnswer(callback: (answer: any) => void) {
+    this.socket.on('answer', callback);
+  }
+
+  onIceCandidate(callback: (candidate: RTCIceCandidate) => void) {
+    this.socket.on('ice-candidate', callback);
   }
 }
