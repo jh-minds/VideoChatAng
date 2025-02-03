@@ -6,7 +6,7 @@ import { io, Socket } from 'socket.io-client';
 })
 export class SignalingService {
   private socket: Socket;
-  private serverUrl: string = 'http://localhost:3000';
+  private serverUrl: string = 'https://signaling-server-i9zw.onrender.com';
 
   constructor() {
     this.socket = io(this.serverUrl);
