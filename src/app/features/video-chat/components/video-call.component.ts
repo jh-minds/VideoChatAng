@@ -1,103 +1,116 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { SignalingService } from '../../../core/services/signaling.service';
+import { Component, OnInit } from '@angular/core';
+import { io } from 'socket.io-client';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-video-call',
   templateUrl: './video-call.component.html',
   styleUrls: ['./video-call.component.css'],
-  standalone: true
+  standalone: true,
+  imports: [CommonModule]
 })
-export class VideoCallComponent {
-  @ViewChild('localVideo') localVideoRef!: ElementRef;
-  @ViewChild('remoteVideo') remoteVideoRef!: ElementRef;
-  private localStream!: MediaStream;
-  private peerConnection!: RTCPeerConnection;
-  private iceServersConfig: RTCConfiguration = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      {
-        urls: "turn:global.xirsys.net",
-        username: "your-username",
-        credential: "your-password"
-      }
-    ]
-  };
+export class VideoChatComponent implements OnInit {
+  private socket: any;
+  private localStream: MediaStream | null = null;
+  private peerConnection: RTCPeerConnection | null = null;
+  private remoteStream: MediaStream | null = null;
+  isInCall = false;
+  private isConnected = false;
+  private userQueue: string[] = [];
 
-  constructor(private signalingService: SignalingService) {
-    this.signalingService.onOffer((offer: RTCSessionDescriptionInit) => this.handleOffer(offer));
-    this.signalingService.onAnswer((answer: RTCSessionDescriptionInit) => this.handleAnswer(answer));
-    this.signalingService.onIceCandidate((candidate: RTCIceCandidate) => this.handleIceCandidate(candidate));
+  constructor() { }
+
+  ngOnInit() {
+    // Connect to the signaling server
+    this.socket = io('https://signaling-server-i9zw.onrender.com', {
+      withCredentials: true
+    });
+
+    this.socket.on('offer', (offer: any) => this.handleOffer(offer));
+    this.socket.on('answer', (answer: any) => this.handleAnswer(answer));
+    this.socket.on('ice-candidate', (candidate: RTCIceCandidate) => this.handleIceCandidate(candidate));
+    this.socket.on('user-joined', (userId: string) => this.matchUsers(userId));
   }
 
-  async ngOnInit() {
-    await this.initLocalStream();
-  }
-
-  async initLocalStream() {
-    try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      this.localVideoRef.nativeElement.srcObject = this.localStream;
-    } catch (err) {
-      console.error('Error accessing media devices.', err);
-    }
-  }
-
-  createPeerConnection() {
-    this.peerConnection = new RTCPeerConnection(this.iceServersConfig);
-
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.signalingService.sendIceCandidate(event.candidate);
-      }
-    };
-
-    this.peerConnection.ontrack = (event) => {
-      this.remoteVideoRef.nativeElement.srcObject = event.streams[0];
-    };
-
-    this.localStream.getTracks().forEach(track => this.peerConnection.addTrack(track, this.localStream));
-  }
-
-  startCall() {
-    this.createPeerConnection();
-
-    this.peerConnection.createOffer().then(offer => {
-      return this.peerConnection.setLocalDescription(offer);
-    }).then(() => {
-      this.signalingService.sendOffer(this.peerConnection.localDescription);
-    }).catch(error => console.error(error));
-  }
-
-  endCall() {
-    if (this.peerConnection) {
-      this.peerConnection.close();
-      this.peerConnection = null as any;
-    }
-
+  ngOnDestroy() {
+    this.socket.disconnect();
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => track.stop());
     }
-
-    this.localVideoRef.nativeElement.srcObject = null;
-    this.remoteVideoRef.nativeElement.srcObject = null;
   }
 
-  handleOffer(offer: RTCSessionDescriptionInit) {
-    this.createPeerConnection();
-    this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-    this.peerConnection.createAnswer().then(answer => {
-      return this.peerConnection.setLocalDescription(answer);
-    }).then(() => {
-      this.signalingService.sendAnswer(this.peerConnection.localDescription);
-    }).catch(error => console.error(error));
+  async startMatchmaking() {
+    // Add user to queue (Here you can handle random matching logic)
+    if (!this.isConnected) {
+      this.userQueue.push('user' + Math.random().toString(36).substring(7)); // Simulating user IDs
+      this.socket.emit('queue', this.userQueue);
+      console.log('Queueing user...');
+    }
   }
 
-  handleAnswer(answer: RTCSessionDescriptionInit) {
-    this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer)).catch(error => console.error(error));
+  private async matchUsers(userId: string) {
+    // Once another user joins the queue, we start the connection process
+    if (this.userQueue.length === 2) {
+      this.isConnected = true;
+      console.log('Matched with:', userId);
+      await this.startVideoCall();
+    }
   }
 
-  handleIceCandidate(candidate: RTCIceCandidate) {
-    this.peerConnection.addIceCandidate(candidate).catch(error => console.error(error));
+  private async startVideoCall() {
+    // Get local media (video and audio)
+    try {
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
+      localVideo.srcObject = this.localStream;
+
+      // Create peer connection
+      this.peerConnection = new RTCPeerConnection();
+
+      // Add local stream to peer connection
+      this.localStream.getTracks().forEach(track => {
+        this.peerConnection?.addTrack(track, this.localStream!);
+      });
+
+      // Create and send an offer
+      const offer = await this.peerConnection.createOffer();
+      await this.peerConnection.setLocalDescription(offer);
+      this.socket.emit('offer', offer);
+
+      this.peerConnection.onicecandidate = (event: any) => {
+        if (event.candidate) {
+          this.socket.emit('ice-candidate', event.candidate);
+        }
+      };
+
+      this.peerConnection.ontrack = (event: any) => {
+        const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
+        this.remoteStream = event.streams[0];
+        remoteVideo.srcObject = this.remoteStream;
+      };
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+    }
+  }
+
+  private async handleOffer(offer: any) {
+    if (this.peerConnection) {
+      this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await this.peerConnection.createAnswer();
+      await this.peerConnection.setLocalDescription(answer);
+      this.socket.emit('answer', answer);
+    }
+  }
+
+  private async handleAnswer(answer: any) {
+    if (this.peerConnection) {
+      this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    }
+  }
+
+  private handleIceCandidate(candidate: RTCIceCandidate) {
+    if (this.peerConnection) {
+      this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    }
   }
 }

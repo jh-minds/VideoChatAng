@@ -1,11 +1,10 @@
-<div>
-  <h1>Video Call</h1>
+<div *ngIf="!isInCall">
+  <button (click)="startMatchmaking()">Start Matching</button>
+</div>
 
-  <div style="display: flex; gap: 10px;">
-    <video #localVideo autoplay muted playsinline style="width: 300px; height: 200px; border: 2px solid black;"></video>
-    <video #remoteVideo autoplay playsinline style="width: 300px; height: 200px; border: 2px solid black;"></video>
+<div *ngIf="isInCall">
+  <div class="video-container">
+    <video id="localVideo" autoplay muted></video>
+    <video id="remoteVideo" autoplay></video>
   </div>
-
-  <button (click)="startCall()">Start Call</button>
-  <button (click)="endCall()">End Call</button>
 </div>
