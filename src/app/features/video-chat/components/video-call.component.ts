@@ -64,6 +64,20 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         console.log('All ICE candidates have been sent');
       }
     };
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('ICE connection state changed:', this.peerConnection.iceConnectionState);
+      if (this.peerConnection.iceConnectionState === 'failed') {
+        console.error('ICE connection failed');
+      }
+    };
+
+    // Connection state change handler
+    this.peerConnection.onconnectionstatechange = () => {
+      console.log('Connection state changed:', this.peerConnection.connectionState);
+      if (this.peerConnection.connectionState === 'failed') {
+        console.error('Connection failed');
+      }
+    };
 
     this.peerConnection.ontrack = (event) => {
       if (!this.remoteStream) {
@@ -98,6 +112,15 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     this.signalingService.onIceCandidate((candidate) => {
       console.log('Received ICE candidate:', candidate);
       this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      if (this.peerConnection.remoteDescription) {
+        this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+          .then(() => {
+            console.log('ICE candidate added successfully');
+          })
+          .catch((error) => {
+            console.error('Error adding ICE candidate:', error);
+          });
+      }
     });
   }
 
