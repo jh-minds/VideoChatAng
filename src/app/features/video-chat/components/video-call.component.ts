@@ -16,7 +16,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private configuration = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
       {
         urls: 'turn:relay1.expressturn.com:3478',
         username: 'efbbbc2c',
