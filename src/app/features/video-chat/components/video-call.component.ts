@@ -58,7 +58,10 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log('Sending ICE candidate:', event.candidate);
         this.signalingService.sendIceCandidate(event.candidate);
+      }else {
+        console.log('All ICE candidates have been sent');
       }
     };
 
@@ -80,6 +83,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   handleSignalingEvents() {
     this.signalingService.onOffer(async (offer) => {
+      console.log('Received offer:', offer);
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
@@ -87,10 +91,12 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     });
 
     this.signalingService.onAnswer(async (answer) => {
+      console.log('Received answer:', answer);
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
     });
 
     this.signalingService.onIceCandidate((candidate) => {
+      console.log('Received ICE candidate:', candidate);
       this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     });
   }
