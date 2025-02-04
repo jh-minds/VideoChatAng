@@ -13,6 +13,7 @@ import { SignalingService } from '../../../core/services/signaling.service';
 export class VideoChatComponent implements OnInit, OnDestroy {
   private localStream!: MediaStream;
   private remoteStream!: MediaStream;
+  private peerConnection: RTCPeerConnection;
   private configuration = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
@@ -23,9 +24,10 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       }
     ]
   };
-  private peerConnection = new RTCPeerConnection(this.configuration);
 
-  constructor(private signalingService: SignalingService) {}
+  constructor(private signalingService: SignalingService) {
+    this.peerConnection = new RTCPeerConnection(this.configuration);
+  }
 
   async ngOnInit() {
     await this.initializeMedia();
