@@ -12,11 +12,19 @@ import { SignalingService } from '../../../core/services/signaling.service';
 })
 export class VideoChatComponent implements OnInit, OnDestroy {
   private localStream!: MediaStream;
-  private peerConnection!: RTCPeerConnection;
   private remoteStream!: MediaStream;
   private configuration = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] // Public STUN server
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+      {
+        urls: 'turn:relay1.expressturn.com:3478',
+        username: 'efbbbc2c',
+        credential: '8D1@abcXYZ'
+      }
+    ]
   };
+  private peerConnection = new RTCPeerConnection(this.configuration);
 
   constructor(private signalingService: SignalingService) {}
 
