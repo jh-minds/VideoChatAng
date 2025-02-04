@@ -1,10 +1,6 @@
-<div *ngIf="!isInCall">
-  <button (click)="startMatchmaking()">Start Matching</button>
+<div class="video-container">
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
 </div>
 
-<div *ngIf="isInCall">
-  <div class="video-container">
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
-  </div>
-</div>
+<button (click)="startCall()">Start Call</button>

@@ -1,11 +1,13 @@
 .video-container {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 video {
   width: 45%;
-  height: auto;
-  border: 1px solid #ccc;
+  max-width: 600px;
+  border: 2px solid black;
+  border-radius: 10px;
 }
