@@ -1,13 +1,67 @@
+/* Base styles */
 .video-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
+  margin: 20px;
+  flex-wrap: wrap;
+}
+
+.video-wrapper {
+  position: relative;
+  max-width: 100%;
+  width: 45%; /* Keep videos side by side */
 }
 
 video {
-  width: 45%;
-  max-width: 600px;
-  border: 2px solid black;
-  border-radius: 10px;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  object-fit: cover; /* Ensures proper aspect ratio */
+}
+
+/* Hide the videos if streams are not initialized */
+video:not([src]) {
+  display: none;
+}
+
+/* Button Styling */
+.start-call-button {
+  background-color: #4CAF50; /* Green button */
+  color: white;
+  font-size: 16px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.start-call-button:hover {
+  background-color: #45a049;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .video-container {
+    flex-direction: column; /* Stack videos vertically on mobile */
+    gap: 15px;
+  }
+
+  .video-wrapper {
+    width: 100%; /* Full width for each video on small screens */
+  }
+
+  .start-call-button {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .start-call-button {
+    width: 100%; /* Make button take full width on very small screens */
+  }
 }
