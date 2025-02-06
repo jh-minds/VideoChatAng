@@ -2,7 +2,7 @@ $navy-blue: #001F3F; // Deep navy background
 $light-gray: #F5F5F5; // Light text color
 $baby-blue: #ADD8E6;
 
-body {
+.background {
   background-color: $navy-blue;
   color: $light-gray; // Ensures text remains readable
   font-family: Arial, sans-serif;
