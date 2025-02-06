@@ -104,7 +104,11 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       console.log('Received offer:', offer);
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await this.peerConnection.createAnswer();
-      await this.peerConnection.setLocalDescription(answer);
+      if (this.peerConnection.signalingState !== "stable") {
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      } else {
+        console.warn("Skipping setRemoteDescription: Already in stable state.");
+      }
       this.signalingService.sendAnswer(answer);
     });
 
