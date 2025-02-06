@@ -1,18 +1,7 @@
 $navy-blue: #001F3F; // Deep navy background
 $baby-blue: #ADD8E6;
 
-body {
-  background-color: $navy-blue;
-  color: white; // Ensures text is visible
-  margin: 0; // Removes default browser margins
-  padding: 0;
-  height: 100vh; // Fills the entire viewport height
-  width: 100vw; // Fills the entire viewport width
-  display: flex;
-  flex-direction: column;
-  align-items: center; // Centers content horizontally
-  justify-content: center; // Centers content vertically
-}
+
 
 .header {
   text-align: center; // Centers text horizontally
