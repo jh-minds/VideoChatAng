@@ -13,37 +13,16 @@ import { SignalingService } from '../../../core/services/signaling.service';
 export class VideoChatComponent implements OnInit, OnDestroy {
   private localStream!: MediaStream;
   private remoteStream!: MediaStream;
-  private peerConnection: RTCPeerConnection;
-  private configuration = {
-    iceServers: [
-      {
-        urls: "stun:stun.relay.metered.ca:80",
-      },
-      {
-        urls: "turn:global.relay.metered.ca:80",
-        username: "330b0f0a85cbe5269c83f76a",
-        credential: "rmINqevi9hYb+IC5",
-      },
-      {
-        urls: "turn:global.relay.metered.ca:80?transport=tcp",
-        username: "330b0f0a85cbe5269c83f76a",
-        credential: "rmINqevi9hYb+IC5",
-      },
-      {
-        urls: "turn:global.relay.metered.ca:443",
-        username: "330b0f0a85cbe5269c83f76a",
-        credential: "rmINqevi9hYb+IC5",
-      },
-      {
-        urls: "turns:global.relay.metered.ca:443?transport=tcp",
-        username: "330b0f0a85cbe5269c83f76a",
-        credential: "rmINqevi9hYb+IC5",
-      },
-  ]
-  };
+  private peerConnection!: RTCPeerConnection;
+  private peerConfiguration: any = {};
 
   constructor(private signalingService: SignalingService) {
-    this.peerConnection = new RTCPeerConnection(this.configuration);
+    (async () => {
+      const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=f764c9d275d91c2b6278756511db1831f3ba");
+      const iceServers = await response.json();
+      this.peerConfiguration.iceServers = iceServers;
+      this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
+    })();
   }
 
   async ngOnInit() {
@@ -71,7 +50,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   }
 
   setupPeerConnection() {
-    this.peerConnection = new RTCPeerConnection(this.configuration);
+    this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
