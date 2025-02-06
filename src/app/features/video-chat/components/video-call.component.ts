@@ -111,7 +111,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
     this.signalingService.onIceCandidate((candidate) => {
       console.log('Received ICE candidate:', candidate);
-      this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       if (this.peerConnection.remoteDescription) {
         this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
           .then(() => {

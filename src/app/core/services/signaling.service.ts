@@ -23,11 +23,13 @@ export class SignalingService {
 
     this.socket.on('connect', () => {
       console.log('Connected to signaling server:', this.socket.id);
+      console.log('Socket connected?:', this.socket.connected);
       this.isConnected = true;
     });
 
     this.socket.on('disconnect', (reason) => {
       console.warn('Disconnected from signaling server:', reason);
+      console.log(this.socket.connected);
       this.isConnected = false;
     });
 
@@ -56,9 +58,18 @@ export class SignalingService {
     });
   }
 
-  sendIceCandidate(candidate: RTCIceCandidate) {
+  sendIceCandidate(candidate: RTCIceCandidate | null) {
+    if (!candidate) {
+      console.warn('No ICE candidate to send.');
+      return;
+    }
+
     this.socket.emit('ice-candidate', candidate, (response: any) => {
-      console.log('ICE candidate sent:', response);
+      if (response?.status === 'ok') {
+        console.log('ICE candidate sent successfully:', response);
+      } else {
+        console.error('Failed to send ICE candidate:', response);
+      }
     });
   }
 
