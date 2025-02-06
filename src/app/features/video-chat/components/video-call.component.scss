@@ -1,3 +1,6 @@
+$baby-blue: #ADD8E6;
+$hover-blue: #91C8E4;
+
 .video-container {
   display: flex;
   flex-wrap: wrap;
@@ -5,34 +8,36 @@
   align-items: center;
   gap: 10px;
   padding: 20px;
+
+  .video-wrapper {
+    position: relative;
+    width: 45%; // Adjust for side-by-side layout
+    max-width: 400px;
+
+    video {
+      width: 100%;
+      height: auto;
+      border: 5px solid $baby-blue; // Baby blue border
+      border-radius: 10px; // Rounded edges
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); // Soft shadow
+    }
+  }
 }
 
-.video-wrapper {
-  position: relative;
-  width: 45%; /* Adjust to fit side-by-side */
-  max-width: 400px;
-}
-
-video {
-  width: 100%;
-  height: auto;
-  border: 5px solid #ADD8E6; /* Baby blue border (0.5cm ≈ 5px) */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a soft look */
-}
-
+// Responsive layout for smaller screens
 @media (max-width: 768px) {
   .video-container {
     flex-direction: column;
   }
 
   .video-wrapper {
-    width: 90%; /* Full width on smaller screens */
+    width: 90%; // Full width on smaller screens
   }
 }
 
+// Styled button
 .start-call-button {
-  background-color: #ADD8E6; /* Baby blue */
+  background-color: $baby-blue;
   color: white;
   font-size: 16px;
   padding: 10px 20px;
@@ -40,8 +45,8 @@ video {
   border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
 
-.start-call-button:hover {
-  background-color: #91C8E4; /* Slightly darker blue on hover */
+  &:hover {
+    background-color: $hover-blue; // Slightly darker blue on hover
+  }
 }

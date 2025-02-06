@@ -8,7 +8,7 @@ import { SignalingService } from '../../../core/services/signaling.service';
   imports: [CommonModule],
   providers: [SignalingService],
   templateUrl: './video-call.component.html',
-  styleUrl: './video-call.component.css'
+  styleUrl: './video-call.component.scss'
 })
 export class VideoChatComponent implements OnInit, OnDestroy {
   private localStream!: MediaStream;
