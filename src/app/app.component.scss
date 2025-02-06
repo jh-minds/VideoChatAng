@@ -3,6 +3,8 @@ $light-gray: #F5F5F5; // Light text color
 $baby-blue: #ADD8E6;
 
 .background {
+  height: 100vh;
+  width: 100vw;
   background-color: $navy-blue;
   color: $light-gray; // Ensures text remains readable
   font-family: Arial, sans-serif;
