@@ -76,15 +76,15 @@ export class SignalingService {
   }
 
   onOffer(callback: (offer: any) => void) {
-    this.socket.once('offer', callback);
+    this.socket.on('offer', callback);
   }
 
   onAnswer(callback: (answer: any) => void) {
-    this.socket.once('answer', callback);
+    this.socket.on('answer', callback);
   }
 
   onIceCandidate(callback: (candidate: RTCIceCandidate) => void) {
-    this.socket.once('ice-candidate', callback);
+    this.socket.on('ice-candidate', callback);
   }
 
   removeListeners() {
