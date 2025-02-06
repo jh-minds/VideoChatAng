@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
+import { VideoChatComponent } from '../../features/video-chat/components/video-call.component';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,7 @@ export class SignalingService {
     this.socket.on('reconnect', (attemptNumber) => {
       console.log(`Reconnected after ${attemptNumber} attempts`);
     });
+
   }
 
   sendOffer(offer: any) {

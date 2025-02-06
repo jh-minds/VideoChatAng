@@ -18,9 +18,9 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
       {
-        urls: 'turn:relay1.expressturn.com:3478',
-        username: 'efbbbc2c',
-        credential: '8D1@abcXYZ'
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
       }
     ]
   };
@@ -64,6 +64,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         console.log('All ICE candidates have been sent');
       }
     };
+
     this.peerConnection.oniceconnectionstatechange = () => {
       console.log('ICE connection state changed:', this.peerConnection.iceConnectionState);
       if (this.peerConnection.iceConnectionState === 'failed') {
