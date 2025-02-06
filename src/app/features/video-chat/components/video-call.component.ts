@@ -113,20 +113,29 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     });
 
     this.signalingService.onAnswer(async (answer) => {
-      console.log('Received answer:', answer);
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      console.log("Received answer:", answer);
+
+      if (!this.peerConnection.remoteDescription) {
+        console.warn("Remote description missing, waiting before setting answer.");
+        return;
+      }
+
+      try {
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log("Answer set successfully.");
+      } catch (error) {
+        console.error("Error setting remote description:", error);
+      }
     });
 
     this.signalingService.onIceCandidate((candidate) => {
-      console.log('Received ICE candidate:', candidate);
+      console.log("Received ICE candidate:", candidate);
       if (this.peerConnection.remoteDescription) {
         this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-          .then(() => {
-            console.log('ICE candidate added successfully');
-          })
-          .catch((error) => {
-            console.error('Error adding ICE candidate:', error);
-          });
+          .then(() => console.log("ICE candidate added successfully"))
+          .catch((error) => console.error("Error adding ICE candidate:", error));
+      } else {
+        console.warn("Skipping ICE candidate, no remote description yet.");
       }
     });
   }
