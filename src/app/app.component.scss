@@ -1,7 +1,19 @@
+$navy-blue: #001F3F; // Deep navy background
+$light-gray: #F5F5F5; // Light text color
+$baby-blue: #ADD8E6;
+
+body {
+  background-color: $navy-blue;
+  color: $light-gray; // Ensures text remains readable
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
 .header {
   text-align: center; // Centers text horizontally
   font-size: 2.5rem; // Adjust size as needed
   font-weight: bold;
-  color: #333; // Change color if needed
+  color: $baby-blue;
   margin: 20px 0; // Adds spacing around the header
 }
