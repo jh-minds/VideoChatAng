@@ -16,13 +16,30 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private peerConnection: RTCPeerConnection;
   private configuration = {
     iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
       {
-        urls: 'turn:openrelay.metered.ca:443',
-        username: 'openrelayproject',
-        credential: 'openrelayproject'
-      }
-    ]
+        urls: "stun:stun.relay.metered.ca:80",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "330b0f0a85cbe5269c83f76a",
+        credential: "rmINqevi9hYb+IC5",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "330b0f0a85cbe5269c83f76a",
+        credential: "rmINqevi9hYb+IC5",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "330b0f0a85cbe5269c83f76a",
+        credential: "rmINqevi9hYb+IC5",
+      },
+      {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "330b0f0a85cbe5269c83f76a",
+        credential: "rmINqevi9hYb+IC5",
+      },
+  ]
   };
 
   constructor(private signalingService: SignalingService) {
