@@ -1,67 +1,47 @@
-/* Base styles */
 .video-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 20px;
-  flex-wrap: wrap;
+  padding: 20px;
 }
 
 .video-wrapper {
   position: relative;
-  max-width: 100%;
-  width: 45%; /* Keep videos side by side */
+  width: 45%; /* Adjust to fit side-by-side */
+  max-width: 400px;
 }
 
 video {
   width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  object-fit: cover; /* Ensures proper aspect ratio */
+  height: auto;
+  border: 5px solid #ADD8E6; /* Baby blue border (0.5cm ≈ 5px) */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a soft look */
 }
 
-/* Hide the videos if streams are not initialized */
-video:not([src]) {
-  display: none;
-}
-
-/* Button Styling */
-.start-call-button {
-  background-color: #4CAF50; /* Green button */
-  color: white;
-  font-size: 16px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.start-call-button:hover {
-  background-color: #45a049;
-}
-
-/* Responsiveness */
 @media (max-width: 768px) {
   .video-container {
-    flex-direction: column; /* Stack videos vertically on mobile */
-    gap: 15px;
+    flex-direction: column;
   }
 
   .video-wrapper {
-    width: 100%; /* Full width for each video on small screens */
-  }
-
-  .start-call-button {
-    font-size: 14px;
-    padding: 10px 20px;
+    width: 90%; /* Full width on smaller screens */
   }
 }
 
-@media (max-width: 480px) {
-  .start-call-button {
-    width: 100%; /* Make button take full width on very small screens */
-  }
+.start-call-button {
+  background-color: #ADD8E6; /* Baby blue */
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.start-call-button:hover {
+  background-color: #91C8E4; /* Slightly darker blue on hover */
 }
