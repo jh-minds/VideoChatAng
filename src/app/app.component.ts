@@ -6,7 +6,7 @@ import { VideoChatComponent } from './features/video-chat/components/video-call.
   selector: 'app-root',
   imports: [RouterOutlet, VideoChatComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrl: './app.component.scss',
   standalone: true
 
 })
