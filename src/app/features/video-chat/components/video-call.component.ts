@@ -24,6 +24,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
     })();
   }
+
   get localStreamAvailable() {
     return this.localStream !== undefined;
   }
