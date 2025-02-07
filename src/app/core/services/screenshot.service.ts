@@ -8,6 +8,16 @@ export class ScreenshotService {
 
   constructor() {}
 
+  triggerScreenshotEffect() {
+    const flash = document.createElement("div");
+    flash.classList.add("screenshot-flash");
+    document.body.appendChild(flash);
+
+    setTimeout(() => {
+      flash.remove();
+    }, 300);
+  }
+
   takeScreenshot() {
     const body = document.body;
 
@@ -20,6 +30,7 @@ export class ScreenshotService {
       link.href = dataUrl;
       link.download = "CreepShot!.png";
       link.click();
+      this.triggerScreenshotEffect();
     });
   }
 }
