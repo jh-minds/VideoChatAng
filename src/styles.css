@@ -10,6 +10,27 @@
   animation: flash-effect 0.3s ease-in-out;
 }
 
+.popup-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 18px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.popup-message.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
 @keyframes flash-effect {
   0% {
     opacity: 0;

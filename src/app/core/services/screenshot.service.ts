@@ -8,7 +8,7 @@ export class ScreenshotService {
 
   constructor() {}
 
-  triggerScreenshotEffect() {
+  private triggerScreenshotEffect() {
     const flash = document.createElement("div");
     flash.classList.add("screenshot-flash");
     document.body.appendChild(flash);
@@ -16,6 +16,20 @@ export class ScreenshotService {
     setTimeout(() => {
       flash.remove();
     }, 300);
+
+    const popup = document.createElement("div");
+    popup.classList.add("popup-message");
+    popup.textContent = "Thanks for reporting creep. The authorities have been notified.";
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+      popup.classList.add("show");
+    }, 300);
+
+    setTimeout(() => {
+      popup.classList.remove("show");
+      setTimeout(() => document.body.removeChild(popup), 500);
+    }, 3000);
   }
 
   takeScreenshot() {
@@ -30,6 +44,7 @@ export class ScreenshotService {
       link.href = dataUrl;
       link.download = "CreepShot!.png";
       link.click();
+
       this.triggerScreenshotEffect();
     });
   }
