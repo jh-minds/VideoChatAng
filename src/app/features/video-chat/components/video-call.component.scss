@@ -1,6 +1,5 @@
-$baby-blue: #ADD8E6;
-$hover-blue: #05151d;
-$navy-blue: #001F3F;
+$mustardy: #EBAC6D;
+$hover-red: #bb5446;
 $light-gray: #F5F5F5;
 
 .video-container {
@@ -18,7 +17,7 @@ $light-gray: #F5F5F5;
     video {
       width: 100%;
       height: auto;
-      border: 5px solid $baby-blue;
+      border: 5px solid $mustardy;
       border-radius: 10px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
@@ -36,8 +35,8 @@ $light-gray: #F5F5F5;
 
 // Styled button
 .start-call-button {
-  background-color: #001F3F;
-  color: white;
+  background-color: #D77163;
+  color: $mustardy;
   font-size: 16px;
   padding: 12px 24px;
   border: none;
@@ -46,7 +45,7 @@ $light-gray: #F5F5F5;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: $hover-blue;
+    background-color: $hover-red;
   }
 }
 
