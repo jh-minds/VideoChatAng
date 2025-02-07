@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SignalingService } from '../../../core/services/signaling.service';
+import { ScreenshotService } from '../../../core/services/screenshot.service';
 
 @Component({
   selector: 'app-video-chat',
@@ -17,13 +18,17 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private peerConfiguration: any = {};
   isCallStarted = false;
 
-  constructor(private signalingService: SignalingService) {
+  constructor(private signalingService: SignalingService,private screenshotService: ScreenshotService) {
     (async () => {
       const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=1e87c8600e853b502b7f065719cf7ba36038");
       const iceServers = await response.json();
       this.peerConfiguration.iceServers = iceServers;
       this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
     })();
+  }
+
+  captureScreen() {
+    this.screenshotService.takeScreenshot();
   }
 
   get localStreamAvailable() {
