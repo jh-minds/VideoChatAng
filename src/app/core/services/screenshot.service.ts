@@ -19,7 +19,7 @@ export class ScreenshotService {
 
     const popup = document.createElement("div");
     popup.classList.add("popup-message");
-    popup.textContent = "Thanks for reporting creep. The authorities have been notified.";
+    popup.textContent = "Thanks for reporting the creep! The authorities have been notified.";
     document.body.appendChild(popup);
 
     setTimeout(() => {
