@@ -18,7 +18,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   constructor(private signalingService: SignalingService) {
     (async () => {
-      const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=073daca3d45f4999c8d19945086e8b279ce9");
+      const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=27696dc5bb05861b531d3981396dd8bc3971");
       const iceServers = await response.json();
       this.peerConfiguration.iceServers = iceServers;
       this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
