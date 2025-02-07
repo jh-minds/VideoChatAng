@@ -48,7 +48,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   async initializeMedia() {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
       if (localVideo) {
         localVideo.srcObject = this.localStream;
