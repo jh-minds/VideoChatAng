@@ -29,7 +29,7 @@ export class ScreenshotService {
     setTimeout(() => {
       popup.classList.remove("show");
       setTimeout(() => document.body.removeChild(popup), 500);
-    }, 3000);
+    }, 5000);
   }
 
   takeScreenshot() {
