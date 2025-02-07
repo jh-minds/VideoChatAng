@@ -15,6 +15,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private remoteStream!: MediaStream;
   private peerConnection!: RTCPeerConnection;
   private peerConfiguration: any = {};
+  isCallStarted = false;
 
   constructor(private signalingService: SignalingService) {
     (async () => {
@@ -47,7 +48,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   async initializeMedia() {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
       if (localVideo) {
         localVideo.srcObject = this.localStream;
@@ -129,6 +130,9 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   }
 
   async startCall() {
+    if (this.isCallStarted) return;
+
+    this.isCallStarted = true;
     const offer = await this.peerConnection.createOffer();
     await this.peerConnection.setLocalDescription(offer);
     this.signalingService.sendOffer(offer);

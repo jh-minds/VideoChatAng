@@ -9,6 +9,7 @@ export class SignalingService {
   private socket!: Socket;
   private serverUrl: string = 'wss://signaling-server-i9zw.onrender.com';
   private isConnected: boolean = false;
+  private currentRoom: string | null = null;
 
   constructor() {
     this.initSocket();
@@ -26,6 +27,7 @@ export class SignalingService {
       console.log('Connected to signaling server:', this.socket.id);
       console.log('Socket connected?:', this.socket.connected);
       this.isConnected = true;
+      this.joinRoom();
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -46,33 +48,45 @@ export class SignalingService {
       console.log(`Reconnected after ${attemptNumber} attempts`);
     });
 
+    this.setupRoomListeners();
+
+  }
+
+  joinRoom() {
+    this.socket.emit('join-room');
+
+    this.socket.on('room-joined', (room: string) => {
+      this.currentRoom = room;
+      console.log(`Joined room: ${room}`);
+    });
+
+    this.socket.on('room-ready', (room: string) => {
+      console.log(`Room is ready: ${room}`);
+    });
   }
 
   sendOffer(offer: any) {
-    this.socket.emit('offer', offer, (response: any) => {
-      console.log('Offer sent:', response);
-    });
+    if (!this.currentRoom) {
+      console.warn("Cannot send offer, not in a room.");
+      return;
+    }
+    this.socket.emit("offer", offer, this.currentRoom);
   }
 
   sendAnswer(answer: any) {
-    this.socket.emit('answer', answer, (response: any) => {
-      console.log('Answer sent:', response);
-    });
-  }
-
-  sendIceCandidate(candidate: RTCIceCandidate | null) {
-    if (!candidate) {
-      console.warn('No ICE candidate to send.');
+    if (!this.currentRoom) {
+      console.warn("Cannot send answer, not in a room.");
       return;
     }
+    this.socket.emit("answer", answer, this.currentRoom);
+  }
 
-    this.socket.emit('ice-candidate', candidate, (response: any) => {
-      if (response?.status === 'ok') {
-        console.log('ICE candidate sent successfully:', response);
-      } else {
-        console.error('Failed to send ICE candidate:', response);
-      }
-    });
+  sendIceCandidate(candidate: RTCIceCandidateInit) {
+    if (!this.currentRoom) {
+      console.warn("Cannot send ICE candidate, not in a room.");
+      return;
+    }
+    this.socket.emit("ice-candidate", candidate, this.currentRoom);
   }
 
   onOffer(callback: (offer: any) => void) {
@@ -83,6 +97,14 @@ export class SignalingService {
     this.socket.on('answer', callback);
   }
 
+  // onOffer(callback: (offer: RTCSessionDescriptionInit) => void) {
+  //   this.socket.on("offer", callback);
+  // }
+
+  // onAnswer(callback: (answer: RTCSessionDescriptionInit) => void) {
+  //   this.socket.on("answer", callback);
+  // }
+
   onIceCandidate(callback: (candidate: RTCIceCandidate) => void) {
     this.socket.on('ice-candidate', callback);
   }
@@ -91,5 +113,18 @@ export class SignalingService {
     this.socket.off('offer');
     this.socket.off('answer');
     this.socket.off('ice-candidate');
+    this.socket.off("room-joined");
+    this.socket.off("room-ready");
+  }
+
+  private setupRoomListeners() {
+    this.socket.on("room-joined", (room: string) => {
+      this.currentRoom = room;
+      console.log(`Joined room: ${room}`);
+    });
+
+    this.socket.on("room-ready", (room: string) => {
+      console.log(`Room is ready: ${room}`);
+    });
   }
 }
