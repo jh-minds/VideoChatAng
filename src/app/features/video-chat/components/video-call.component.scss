@@ -4,11 +4,12 @@ $light-gray: #F5F5F5;
 
 .video-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 50px; // Increased spacing between videos
+  gap: 20px; // Reduced gap for better spacing
   padding: 20px;
+  width: 100%;
+  flex-wrap: nowrap;
 
   .video-wrapper {
     position: relative;
@@ -19,6 +20,7 @@ $light-gray: #F5F5F5;
     video {
       width: 100%;
       height: auto;
+      aspect-ratio: 16 / 9;
       border: $mustardy;
       border-radius: 10px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -54,13 +56,29 @@ $light-gray: #F5F5F5;
 
 @media (max-width: 768px) {
   .video-container {
-    flex-wrap: nowrap; // Prevents videos from stacking
-    flex-direction: row; // Ensures they stay side-by-side
-    overflow-x: auto; // Allows scrolling if necessary
+    flex-direction: row;
   }
 
   .video-wrapper {
-    width: 45%;
-    flex: 1 1 45%; // Keeps them equal-sized even on mobile
+    flex: 1 1 50%;
+    max-width: 50%;
+  }
+}
+
+// Prevents resizing on orientation change
+@media (orientation: landscape) {
+  .video-container {
+    height: 100vh; // Keeps videos from shrinking
+  }
+
+  .video-wrapper {
+    max-width: 50%;
+    height: auto;
+  }
+}
+
+@media (orientation: portrait) {
+  .video-container {
+    height: auto;
   }
 }
