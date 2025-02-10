@@ -55,6 +55,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.initializeMedia();
     await this.initializeConnection();
+    await this.startCall();
   }
 
   ngOnDestroy() {
