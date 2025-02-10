@@ -17,8 +17,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private peerConnection!: RTCPeerConnection;
   private peerConfiguration: any = {}; // ICE server configuration will be assigned later
 
-  otherUserReady = false;
-  isReady = false;
   isCallStarted = false;
   // Optionally track reconnection attempts (and set a limit)
   private reconnectionAttempts = 0;
@@ -57,22 +55,11 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.initializeMedia();
     await this.initializeConnection();
-
-    this.signalingService.onOtherUserReady(() => {
-      console.log("Other user is now ready.");
-      this.otherUserReady = true;
-
-      // If this user already clicked "Start Call", start the call
-      if (this.isReady && !this.isCallStarted) {
-          this.startCall();
-      }
-  });
   }
 
   ngOnDestroy() {
     this.signalingService.removeListeners();
     this.teardownConnection();
-    this.isReady = false;
   }
 
   /**
@@ -178,18 +165,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     // Remove any existing listeners to avoid duplicate handling.
     this.signalingService.removeListeners();
 
-    this.signalingService.onOtherUserReady(() => {
-      console.log("Other participant is ready.");
-      this.otherUserReady = true;
-
-      // If we are also ready, start the call
-      if (this.isReady && !this.isCallStarted) {
-          console.log("Both users are ready. Starting the call...");
-          this.isCallStarted = true;
-          this.startCall();
-      }
-  });
-
     this.signalingService.onOffer(async (offer) => {
       console.log('Received offer:', offer);
       try {
@@ -229,29 +204,20 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   /**
    * Initiates the call by creating and sending an offer.
    */
-  async startCall() {
-    if (this.isCallStarted) return;
+async startCall() {
+  if (this.isCallStarted) return;
 
-    console.log("User is ready, waiting for the other participant...");
-    this.isReady = true;
-    this.signalingService.sendReadySignal(); // Notify the other user
+  this.isCallStarted = true;
+  const offer = await this.peerConnection.createOffer();
+  await this.peerConnection.setLocalDescription(offer);
+  this.signalingService.sendOffer(offer);
 
-    // Check if the other user is already ready
-    if (this.otherUserReady) {
-        console.log("Both users are ready. Starting the call...");
-        this.isCallStarted = true;
-
-        const offer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(offer);
-        this.signalingService.sendOffer(offer);
-
-        // REATTACH LOCAL STREAM TO VIDEO ELEMENT
-        const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
-        if (localVideo && !localVideo.srcObject) {
-            console.log("Ensuring local video is visible...");
-            localVideo.srcObject = this.localStream;
-        }
-    }
+  // REATTACH LOCAL STREAM TO VIDEO ELEMENT
+  const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
+  if (localVideo && !localVideo.srcObject) {
+    console.log("Ensuring local video is visible...");
+    localVideo.srcObject = this.localStream;
+  }
 }
 
 
