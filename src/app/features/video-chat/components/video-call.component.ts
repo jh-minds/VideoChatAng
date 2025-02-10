@@ -81,11 +81,19 @@ export class VideoChatComponent implements OnInit, OnDestroy {
    * Creates and configures a new RTCPeerConnection.
    */
   async initializeConnection() {
+    console.log("Initializing new connection...");
+
+    // Ensure local media is available before setting up the connection
+    if (!this.localStream) {
+        console.warn("Local stream not available, attempting to initialize...");
+        await this.initializeMedia();
+    }
+
     // Reset the remote stream and attach it to the remote video element.
     this.remoteStream = new MediaStream();
     const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
     if (remoteVideo) {
-      remoteVideo.srcObject = this.remoteStream;
+        remoteVideo.srcObject = this.remoteStream;
     }
 
     // Create a new peer connection using the configuration (which includes ICE servers).
@@ -93,47 +101,53 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
     // Set up ICE candidate handling.
     this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        console.log('Sending ICE candidate:', event.candidate);
-        this.signalingService.sendIceCandidate(event.candidate);
-      } else {
-        console.log('All ICE candidates have been sent');
-      }
+        if (event.candidate) {
+            console.log('Sending ICE candidate:', event.candidate);
+            this.signalingService.sendIceCandidate(event.candidate);
+        } else {
+            console.log('All ICE candidates have been sent');
+        }
     };
 
     // Monitor ICE connection state for disconnections.
     this.peerConnection.oniceconnectionstatechange = () => {
-      console.log('ICE connection state:', this.peerConnection.iceConnectionState);
-      if (
-        this.peerConnection.iceConnectionState === 'disconnected' ||
-        this.peerConnection.iceConnectionState === 'failed'
-      ) {
-        console.warn('ICE connection lost, attempting to reconnect...');
-        this.handleReconnection();
-      }
+        console.log('ICE connection state:', this.peerConnection.iceConnectionState);
+        if (
+            this.peerConnection.iceConnectionState === 'disconnected' ||
+            this.peerConnection.iceConnectionState === 'failed'
+        ) {
+            console.warn('ICE connection lost, attempting to reconnect...');
+            this.handleReconnection();
+        }
     };
 
     // Monitor overall connection state.
     this.peerConnection.onconnectionstatechange = () => {
-      console.log('Peer connection state:', this.peerConnection.connectionState);
-      if (this.peerConnection.connectionState === 'failed') {
-        console.error('Peer connection failed, attempting to reconnect...');
-        this.handleReconnection();
-      }
+        console.log('Peer connection state:', this.peerConnection.connectionState);
+        if (this.peerConnection.connectionState === 'failed') {
+            console.error('Peer connection failed, attempting to reconnect...');
+            this.handleReconnection();
+        }
     };
 
     // Handle incoming remote tracks.
     this.peerConnection.ontrack = (event) => {
-      console.log('Received remote track:', event.track);
-      // Add tracks to the remote stream.
-      this.remoteStream.addTrack(event.track);
+        console.log('Received remote track:', event.track);
+        this.remoteStream.addTrack(event.track);
     };
 
-    // Add all tracks from the local media stream.
+    // Ensure local stream tracks are added again after reconnection
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => {
-        this.peerConnection.addTrack(track, this.localStream);
-      });
+        this.localStream.getTracks().forEach(track => {
+            this.peerConnection.addTrack(track, this.localStream);
+        });
+    }
+
+    // **Reattach local video stream** to prevent it from turning black
+    const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
+    if (localVideo) {
+        console.log("Reattaching local video stream...");
+        localVideo.srcObject = this.localStream;
     }
 
     // Attach signaling event handlers.
@@ -141,7 +155,8 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
     // Reset reconnection attempts on successful connection initialization.
     this.reconnectionAttempts = 0;
-  }
+}
+
 
   /**
    * Sets up event listeners for signaling (offer, answer, and ICE candidates).
@@ -191,16 +206,20 @@ export class VideoChatComponent implements OnInit, OnDestroy {
    */
   async startCall() {
     if (this.isCallStarted) return;
+
     this.isCallStarted = true;
-    try {
-      const offer = await this.peerConnection.createOffer();
-      await this.peerConnection.setLocalDescription(offer);
-      this.signalingService.sendOffer(offer);
-    } catch (error) {
-      console.error('Error starting call:', error);
-      this.handleReconnection();
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+    this.signalingService.sendOffer(offer);
+
+    // REATTACH LOCAL STREAM TO VIDEO ELEMENT
+    const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
+    if (localVideo && !localVideo.srcObject) {
+      console.log("Ensuring local video is visible...");
+      localVideo.srcObject = this.localStream;
     }
   }
+
 
   /**
    * Tears down the current peer connection and stops media tracks.
@@ -208,17 +227,19 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   private teardownConnection() {
     console.log('Tearing down connection.');
     // Stop local media tracks.
-    if (this.localStream) {
-      this.localStream.getTracks().forEach(track => track.stop());
-    }
+    // if (this.localStream) {
+    //   this.localStream.getTracks().forEach(track => track.stop());
+    // }
     // Remove event handlers and close the peer connection.
     if (this.peerConnection) {
       this.peerConnection.onicecandidate = null;
-      this.peerConnection.oniceconnectionstatechange = null;
-      this.peerConnection.onconnectionstatechange = null;
       this.peerConnection.ontrack = null;
+      this.peerConnection.onconnectionstatechange = null;
       this.peerConnection.close();
+      this.peerConnection = null!;
     }
+
+    this.remoteStream = null!;
   }
 
   /**
