@@ -20,7 +20,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   constructor(private signalingService: SignalingService,private screenshotService: ScreenshotService) {
     (async () => {
-      const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=df4eba5db451c226aef4b6f6e3786aca79b8");
+      const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=7c2d35b756dd1ef5d1a447a2d6def2feec7f");
       const iceServers = await response.json();
       this.peerConfiguration.iceServers = iceServers;
       this.peerConnection = new RTCPeerConnection(this.peerConfiguration);
@@ -53,7 +53,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   async initializeMedia() {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       const localVideo = document.getElementById('localVideo') as HTMLVideoElement;
       if (localVideo) {
         localVideo.srcObject = this.localStream;
