@@ -80,6 +80,17 @@ export class SignalingService {
     }
     this.socket.emit("answer", answer, this.currentRoom);
   }
+  sendReadySignal() {
+    if (!this.currentRoom) {
+        console.warn("Cannot send ready signal, not in a room.");
+        return;
+    }
+    this.socket.emit("user-ready", this.currentRoom);
+}
+
+onOtherUserReady(callback: () => void) {
+    this.socket.on("other-user-ready", callback);
+}
 
   sendIceCandidate(candidate: RTCIceCandidateInit) {
     if (!this.currentRoom) {
