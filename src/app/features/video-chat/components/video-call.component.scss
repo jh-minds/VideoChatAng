@@ -12,7 +12,9 @@ $light-gray: #F5F5F5;
 
   .video-wrapper {
     position: relative;
-    width: 70vh;
+    width: 45%;
+    max-width: 400px;
+    flex: 1 1 45%;
 
     video {
       width: 100%;
@@ -50,14 +52,15 @@ $light-gray: #F5F5F5;
   }
 }
 
-// Responsive layout for smaller screens
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
   .video-container {
-    flex-direction: column;
+    flex-wrap: nowrap; // Prevents videos from stacking
+    flex-direction: row; // Ensures they stay side-by-side
+    overflow-x: auto; // Allows scrolling if necessary
   }
 
   .video-wrapper {
-    width: 90%;
+    width: 45%;
+    flex: 1 1 45%; // Keeps them equal-sized even on mobile
   }
 }
- */
