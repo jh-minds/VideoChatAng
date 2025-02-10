@@ -73,10 +73,9 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       if (localVideo) {
         localVideo.srcObject = this.localStream;
       }
-      this.applyAudioProcessing();
-  } catch (error) {
-    console.error('Error accessing media devices:', error);
-  }
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+    }
   }
 
   /**
@@ -96,7 +95,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
     if (remoteVideo) {
         remoteVideo.srcObject = this.remoteStream;
-        remoteVideo.volume = 0.3;
     }
 
     // Create a new peer connection using the configuration (which includes ICE servers).
@@ -159,24 +157,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     // Reset reconnection attempts on successful connection initialization.
     this.reconnectionAttempts = 0;
 }
-applyAudioProcessing() {
-  const audioContext = new AudioContext();
-  const source = audioContext.createMediaStreamSource(this.localStream);
-  const gainNode = audioContext.createGain();
 
-  gainNode.gain.value = 0.3; // Reduce to 30% volume (adjust as needed)
-
-  source.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-
-  // Apply the processed audio back to the stream
-  this.localStream.getAudioTracks().forEach((track) => {
-    track.enabled = false; // Disable original track (prevents duplicate audio)
-  });
-
-  // Replace the original stream with the modified audio
-  this.localStream = audioContext.createMediaStreamDestination().stream;
-}
 
   /**
    * Sets up event listeners for signaling (offer, answer, and ICE candidates).
