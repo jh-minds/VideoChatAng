@@ -6,9 +6,10 @@ $light-gray: #F5F5F5;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; // Reduced gap for better spacing
+  gap: 20px;
   padding: 20px;
   width: 100%;
+  flex-direction: row;
   flex-wrap: nowrap;
 
   .video-wrapper {
@@ -53,10 +54,21 @@ $light-gray: #F5F5F5;
   }
 }
 
+@media (min-width: 1024px) {
+  .video-container {
+    height: 80vh; // Allows the videos to take more screen space
+  }
+
+  .video-wrapper {
+    width: 48%;
+    max-width: 600px;
+    flex: 1 1 48%;
+  }
+}
+
 @media (max-width: 768px) {
   .video-container {
-    flex-wrap: nowrap; // Prevents videos from stacking
-    flex-direction: row; // Ensures they stay side-by-side
+    flex-direction: row;
     overflow-x: auto; // Allows scrolling if necessary
   }
 

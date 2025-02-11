@@ -32,7 +32,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=0a11e88d9cb9ce5ac70ab25e74f6ebfff6f0");
         const iceServers = await response.json();
         this.peerConfiguration.iceServers = iceServers;
-        // Note: We do not create a peer connection here. That is handled in initializeConnection().
       } catch (error) {
         console.error('Error fetching TURN credentials:', error);
       }
@@ -42,14 +41,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   // Utility to capture the screen
   captureScreen() {
     this.screenshotService.takeScreenshot();
-  }
-
-  get localStreamAvailable() {
-    return !!this.localStream;
-  }
-
-  get remoteStreamAvailable() {
-    return !!this.remoteStream;
   }
 
   async ngOnInit() {
