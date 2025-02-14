@@ -29,7 +29,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     // Fetch TURN/ICE server credentials and store them in the configuration.
     (async () => {
       try {
-        const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=933caf0a2c578d0ad0b4dcc03360aa1f45b9");
+        const response = await fetch("https://videochatang.metered.live/api/v1/turn/credentials?apiKey=dbad7df6a8da191cce6c21d1a9998b238e71");
         const iceServers = await response.json();
         this.peerConfiguration.iceServers = iceServers;
       } catch (error) {
